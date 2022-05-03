@@ -1,0 +1,86 @@
+# Fern Intermediate Representation (IR) is similar to the raw fern.yml format
+# except it contains an `encoding` key that determines how the types will be
+# encoded over the wire. By default, JSON is used.
+
+encoding: hathora-binary
+
+ids:
+  UserId: string
+  StateId: string
+types:
+  Gesture:
+    enum:
+      - ROCK
+      - PAPER
+      - SCISSOR
+  PlayerInfo:
+    fields:
+      id: UserId
+      score: integer
+      gesture: optional<Gesture>
+  PlayerState:
+    fields:
+      round: integer
+      player1: optional<PlayerInfo>
+      player2: optional<PlayerInfo>
+  UserState: PlayerState
+
+  # This is the update that the BE receives after the coordinator forwards the
+  # FE's message. This is weird because the FE does not actually include
+  # stateId or userId, so the generated client on the FE will be incorrect.
+  UserStateInfo:
+    properties:
+      stateId: StateId
+      userId: UserId
+
+  # This is the update that the BE sends toe the coordinator. This is weird
+  # because the FE does not actually receive the stateId or userId, so the
+  # generated client on the FE will be incorrect.
+  UserStateUpdate:
+    extends: PlayerState
+    properties:
+      stateId: StateId
+      userId: UserId
+
+  ChooseGestureBody:
+    extends: UserStateInfo
+    properties:
+      gesture: Gesture
+
+channels:
+  websocket:
+    # this is the channel where the FE communicates
+    # with the coordinator
+    FrontendToCoordinatorChannel:
+      path: /hathora/3891-293-1232-2123-1232-1132
+      messages:
+        initialize:
+          origin: client
+          body: UserStateInfo
+          # before going over the wire, this PlayerState is encoded
+          # using hathora-binary, which could be a snapshot or a diff,
+          # i.e. depending on the first bit. The client will also use
+          # hathora-binary to decode this message.
+          response:
+            type: UserStateUpdate
+            behavior: request-response
+        joinGame:
+          origin: client
+          body: UserStateInfo
+          response:
+            type: UserStateUpdate
+            behavior: request-response
+        chooseGesture:
+          origin: client
+          body: ChooseGestureBody
+          response:
+            type: UserStateUpdate
+            behavior: request-response
+        nextRound:
+          origin: client
+          body: UserStateInfo
+          response:
+            type: UserStateUpdate
+            behavior: request-response
+
+
