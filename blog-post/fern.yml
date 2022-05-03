@@ -1,0 +1,32 @@
+# this is an example fern.yml!
+
+ids:
+  - BlogPostId
+types:
+  BlogPost:
+    properties:
+      id: BlogPostId
+      name: string
+
+channels:
+  BlogPostChannel:
+    path: /blog-posts
+    messages:
+      getBlogPost:
+        origin: client
+        body: BlogPostId
+        response:
+          type: BlogPost
+          # this message is awaitable, e.g.
+          # const blogPost = await getBlogPost()
+          behavior: request-response
+      subscribeToBlogPost:
+        origin: client
+        body: BlogPostId
+        response:
+          type: BlogPost
+          # this request yields a subscription, e.g.
+          # subscribeToBlogPost((newBlogPost) => {
+          #   console.log("Received new blog post!")
+          # })
+          behavior: subscription
