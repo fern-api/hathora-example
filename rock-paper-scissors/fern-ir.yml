@@ -7,23 +7,23 @@ encoding: hathora-binary
 ids:
   UserId: string
   StateId: string
-types: 
+types:
   Gesture:
-    enum:  
-	    - ROCK 
-	    - PAPER 
-	    - SCISSOR
-  PlayerInfo: 
-    fields: 
-	    id: UserId
-	    score: integer
-	    gesture: optional<Gesture>
+    enum:
+      - ROCK
+      - PAPER
+      - SCISSOR
+  PlayerInfo:
+    fields:
+      id: UserId
+      score: integer
+      gesture: optional<Gesture>
   PlayerState:
-    fields: 
+    fields:
       round: integer
-	    player1: optional<PlayerInfo>
-			player2: optional<PlayerInfo>
-	UserState: PlayerState
+      player1: optional<PlayerInfo>
+      player2: optional<PlayerInfo>
+  UserState: PlayerState
 
   # This is the update that the BE receives after the coordinator forwards the
   # FE's message. This is weird because the FE does not actually include
@@ -41,7 +41,7 @@ types:
     properties:
       stateId: StateId
       userId: UserId
-  
+
   ChooseGestureBody:
     extends: UserStateInfo
     properties:
@@ -54,7 +54,7 @@ channels:
     FrontendToCoordinatorChannel:
       path: /hathora/3891-293-1232-2123-1232-1132
       messages:
-        initialize: 
+        initialize:
           origin: client
           body: UserStateInfo
           # before going over the wire, this PlayerState is encoded
@@ -70,7 +70,7 @@ channels:
           response:
             type: UserStateUpdate
             behavior: request-response
-        chooseGesture: 
+        chooseGesture:
           origin: client
           body: ChooseGestureBody
           response:
@@ -82,5 +82,5 @@ channels:
           response:
             type: UserStateUpdate
             behavior: request-response
-      
-  
+
+
