@@ -1,0 +1,54 @@
+encoding: hathora-binary
+
+types: 
+  UserId: string
+  Gesture:
+    enum:  
+	    - ROCK 
+	    - PAPER
+	    - SCISSOR
+  PlayerInfo: 
+    fields: 
+	    id: UserId
+	    score: integer
+	    gesture: optional<Gesture>
+  PlayerState:
+    fields: 
+      round: integer
+	    player1: optional<PlayerInfo>
+			player2: optional<PlayerInfo>
+	UserState: PlayerState
+
+channels:
+  websocket:
+    RockPaperScissorsChannel:
+      path: /hathora/
+      headers: 
+        userId: UserId
+      messages:
+        initialize: 
+          origin: client
+          type: request-response
+          requestBody: {}
+          # hathora will encode into binary
+          # i.e. first bit represents snapshots/diff, etc.
+          responseBody: PlayerState
+        joinGame:
+          origin: client
+          type: request-response
+          requestBody: {}
+          responseBody: PlayerState
+        chooseGesture: 
+          origin: client
+          type: request-response
+          requestBody: 
+            fields: 
+              gesture: Gesture
+          responseBody: PlayerStateDiff
+        nextRound:
+          origin: client
+          type: request-response
+          requestBody: {}
+          responseBody: PlayerState
+  
+ rest: {}
