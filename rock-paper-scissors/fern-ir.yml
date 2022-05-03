@@ -1,7 +1,13 @@
+# Fern Intermediate Representation (IR) is similar to the raw fern.yml format
+# except it contains an `encoding` key that determines how the types will be
+# encoded over the wire. By default, JSON is used.
+
 encoding: hathora-binary
 
-types: 
+ids:
   UserId: string
+  StateId: string
+types: 
   Gesture:
     enum:  
 	    - ROCK 
@@ -18,37 +24,40 @@ types:
 	    player1: optional<PlayerInfo>
 			player2: optional<PlayerInfo>
 	UserState: PlayerState
+  UserStateUpdate:
+    extends: PlayerState
+    properties:
+      stateId: StateId
+      # TODO: Hathora also sends the user ID on every state update. ¿Por que?
 
 channels:
   websocket:
     RockPaperScissorsChannel:
-      path: /hathora/
-      headers: 
-        userId: UserId
+      path: /hathora/3891-293-1232-2123-1232-1132
       messages:
         initialize: 
           origin: client
-          type: request-response
-          requestBody: {}
-          # hathora will encode into binary
-          # i.e. first bit represents snapshots/diff, etc.
-          responseBody: PlayerState
+          # before going over the wire, this PlayerState is encoded
+          # using hathora-binary, which could be a snapshot or a diff,
+          # i.e. depending on the first bit. The client will also use
+          # hathora-binary to decode this message.
+          response:
+            type: UserStateUpdate
+            behavior: request-response
         joinGame:
           origin: client
-          type: request-response
-          requestBody: {}
-          responseBody: PlayerState
+          response:
+            type: UserStateUpdate
+            behavior: request-response
         chooseGesture: 
           origin: client
-          type: request-response
-          requestBody: 
-            fields: 
-              gesture: Gesture
-          responseBody: PlayerStateDiff
+          body: Gesture
+          response:
+            type: UserStateUpdate
+            behavior: request-response
         nextRound:
           origin: client
-          type: request-response
-          requestBody: {}
-          responseBody: PlayerState
+          response:
+            type: UserStateUpdate
+            behavior: request-response
   
- rest: {}
