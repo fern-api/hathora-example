@@ -1,3 +1,5 @@
+# this is an example hathora.yml
+
 types:
   Gesture:
     - ROCK
