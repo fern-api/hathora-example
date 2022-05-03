@@ -49,9 +49,7 @@ types:
 
 channels:
   websocket:
-    # this is the channel where the FE communicates
-    # with the coordinator
-    FrontendToCoordinatorChannel:
+    RockPaperScissorsChannel:
       path: /hathora/3891-293-1232-2123-1232-1132
       messages:
         initialize:
@@ -82,5 +80,3 @@ channels:
           response:
             type: UserStateUpdate
             behavior: request-response
-
-
