@@ -21,62 +21,86 @@ types:
   PlayerState:
     fields:
       round: integer
-      player1: optional<PlayerInfo>
-      player2: optional<PlayerInfo>
-  UserState: PlayerState
-
-  # This is the update that the BE receives after the coordinator forwards the
-  # FE's message. This is weird because the FE does not actually include
-  # stateId or userId, so the generated client on the FE will be incorrect.
-  UserStateInfo:
-    properties:
+	    player1: optional<PlayerInfo>
+			player2: optional<PlayerInfo>
+	UserState: PlayerState
+  InitializeRequest: {}
+  CreateRoomResponse: 
+    fields: 
       stateId: StateId
-      userId: UserId
 
-  # This is the update that the BE sends toe the coordinator. This is weird
-  # because the FE does not actually receive the stateId or userId, so the
-  # generated client on the FE will be incorrect.
-  UserStateUpdate:
-    extends: PlayerState
-    properties:
-      stateId: StateId
-      userId: UserId
 
-  ChooseGestureBody:
-    extends: UserStateInfo
-    properties:
-      gesture: Gesture
+services: 
+  http: 
+    MatchMakingService: 
+      base-path: /3891-293-1232-2123-1232-1132
+      endpoints: 
+        createRoom: 
+          method: POST
+          auth: bearer
+          path: /create
+          request: InitializeRequest
+          response: CreateRoomResponse
+    AnonymousLoginService: 
+      base-path: /3891-293-1232-2123-1232-1132
+      endpoints: 
+        loginAnonymous: 
+          method: POST
+          path: /login/anonymous
+          request: {}
+          response: 
+            properties: 
+              token: string
 
 channels:
   websocket:
-    RockPaperScissorsChannel:
-      path: /hathora/3891-293-1232-2123-1232-1132
+    RockPaperScissorsClientChannel:
+      path: /3891-293-1232-2123-1232-1132
       messages:
         initialize:
           origin: client
-          body: UserStateInfo
-          # before going over the wire, this PlayerState is encoded
+          body: InitializeRequest
+          response:
+            type: UserState
+            behavior: request-response
+          # before going over the wire, UserState is encoded
           # using hathora-binary, which could be a snapshot or a diff,
           # i.e. depending on the first bit. The client will also use
           # hathora-binary to decode this message.
-          response:
-            type: UserStateUpdate
-            behavior: request-response
         joinGame:
           origin: client
           body: UserStateInfo
           response:
-            type: UserStateUpdate
+            type: UserState
             behavior: request-response
         chooseGesture:
           origin: client
           body: ChooseGestureBody
           response:
-            type: UserStateUpdate
+            type: UserState
             behavior: request-response
         nextRound:
           origin: client
           body: UserStateInfo
           response:
-            type: UserStateUpdate
+            type: UserState
             behavior: request-response
+        connect: 
+          origin: client
+          body: 
+            properties: 
+              token: string
+              stateId: string # Should this be a bigint or int? 
+        findMatch: 
+          origin: client
+          body: 
+            properties: 
+              token: string
+              numPlayers: integer
+              request: InitializeRequest
+          responses: 
+            body: 
+              fields: 
+                matched: boolean
+                stateId: optional<StateId>
+            behavior: subscription
