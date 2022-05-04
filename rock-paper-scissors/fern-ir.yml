@@ -7,19 +7,19 @@ encoding: hathora-binary
 ids:
   UserId: string
   StateId: string
-types: 
+types:
   Gesture:
-    enum:  
-	    - ROCK 
-	    - PAPER
-	    - SCISSOR
-  PlayerInfo: 
-    fields: 
-	    id: UserId
-	    score: integer
-	    gesture: optional<Gesture>
+    enum:
+      - ROCK
+      - PAPER
+      - SCISSOR
+  PlayerInfo:
+    fields:
+      id: UserId
+      score: integer
+      gesture: optional<Gesture>
   PlayerState:
-    fields: 
+    fields:
       round: integer
 	    player1: optional<PlayerInfo>
 			player2: optional<PlayerInfo>
@@ -57,7 +57,7 @@ channels:
     RockPaperScissorsClientChannel:
       path: /3891-293-1232-2123-1232-1132
       messages:
-        initialize: 
+        initialize:
           origin: client
           body: InitializeRequest
           response:
@@ -69,17 +69,19 @@ channels:
           # hathora-binary to decode this message.
         joinGame:
           origin: client
+          body: UserStateInfo
           response:
             type: UserState
             behavior: request-response
-        chooseGesture: 
+        chooseGesture:
           origin: client
-          body: Gesture
+          body: ChooseGestureBody
           response:
             type: UserState
             behavior: request-response
         nextRound:
           origin: client
+          body: UserStateInfo
           response:
             type: UserState
             behavior: request-response
