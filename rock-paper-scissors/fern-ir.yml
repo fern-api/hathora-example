@@ -31,7 +31,7 @@ types:
 
 services:
   http:
-    MatchMakingService:
+    RockPaperScissorsClientService:
       base-path: /3891-293-1232-2123-1232-1132
       endpoints:
         createRoom:
@@ -40,9 +40,6 @@ services:
           path: /create
           request: InitializeRequest
           response: CreateRoomResponse
-    AnonymousLoginService:
-      base-path: /3891-293-1232-2123-1232-1132
-      endpoints:
         loginAnonymous:
           method: POST
           path: /login/anonymous
