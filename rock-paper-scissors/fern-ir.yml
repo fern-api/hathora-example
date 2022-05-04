@@ -23,33 +23,32 @@ types:
       round: integer
       player1: optional<PlayerInfo>
       player2: optional<PlayerInfo>
-	UserState: PlayerState
+  UserState: PlayerState
   InitializeRequest: {}
-  CreateRoomResponse: 
-    fields: 
+  CreateRoomResponse:
+    fields:
       stateId: StateId
 
-
-services: 
-  http: 
-    MatchMakingService: 
+services:
+  http:
+    MatchMakingService:
       base-path: /3891-293-1232-2123-1232-1132
-      endpoints: 
-        createRoom: 
+      endpoints:
+        createRoom:
           method: POST
           auth: bearer
           path: /create
           request: InitializeRequest
           response: CreateRoomResponse
-    AnonymousLoginService: 
+    AnonymousLoginService:
       base-path: /3891-293-1232-2123-1232-1132
-      endpoints: 
-        loginAnonymous: 
+      endpoints:
+        loginAnonymous:
           method: POST
           path: /login/anonymous
           request: {}
-          response: 
-            properties: 
+          response:
+            properties:
               token: string
 
 channels:
@@ -85,22 +84,22 @@ channels:
           response:
             type: UserState
             behavior: request-response
-        connect: 
+        connect:
           origin: client
-          body: 
-            properties: 
+          body:
+            properties:
               token: string
-              stateId: string # Should this be a bigint or int? 
-        findMatch: 
+              stateId: string # Should this be a bigint or int?
+        findMatch:
           origin: client
-          body: 
-            properties: 
+          body:
+            properties:
               token: string
               numPlayers: integer
               request: InitializeRequest
-          responses: 
-            body: 
-              fields: 
+          responses:
+            body:
+              fields:
                 matched: boolean
                 stateId: optional<StateId>
             behavior: subscription
