@@ -21,8 +21,8 @@ types:
   PlayerState:
     fields:
       round: integer
-	    player1: optional<PlayerInfo>
-			player2: optional<PlayerInfo>
+      player1: optional<PlayerInfo>
+      player2: optional<PlayerInfo>
 	UserState: PlayerState
   InitializeRequest: {}
   CreateRoomResponse: 
